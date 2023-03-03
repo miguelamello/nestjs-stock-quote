@@ -1,0 +1,16 @@
+{
+  "name": "pruvo",
+  "version": "1.0.0",
+  "description": "Currency Conversion Microservice for Pruvo Code Assignment.",
+  "main": "index.js",
+  "directories": {
+    "dist": "dist",
+    "src": "src", 
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Miguel Angelo Mello ",
+  "license": "ISC"
+}
