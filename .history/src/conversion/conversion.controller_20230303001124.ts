@@ -3,7 +3,6 @@ import * as validator from 'email-validator';
 import { queryParams } from '../interfaces/queryParam.interface';
 import BaseRates from '../interfaces/BaseRates';
 import CalcRate from '../interfaces/CalcRate';
-import Conversion from '../interfaces/Conversion';
 import { Message } from '../interfaces/message.interface';
 import currencyCodes from './currency-codes';
 import currencyNames from './currency-names';
@@ -32,24 +31,13 @@ export class ConversionController {
     this.getRemoteBaseRates().then((rates) => {
       this.setBaseRates(rates);
       this.setCalcRates();
-      this.updateRemoteBaseRates();
     });
 
     // Subscribe to the observable to receive messages from the queue
     this.awsSqsService.getMessage$().subscribe((message) => {
-      const conversion: Conversion = this.doConversion(message.body);
-      this.sendMailUser(conversion);
+      this.doConversion(message.body);
     });
   }    
-
-  // Send an email to the user with the conversion result
-  private sendMailUser( conversion: Conversion ) {
-    const to = conversion.user_email;
-    const subject = 'Conversion result';
-    const body = `The conversion from ${conversion.source_currency} ${conversion.source_value} to ${conversion.target_currency} is ${conversion.target_value} with a conversion rate of ${conversion.conversion_rate} at ${conversion.utc_datetime}.`;
-    //mailer.send(to, subject, body);
-    console.log(to, subject, body);
-  }
 
   // Set the base rates
   private setBaseRates( rates: BaseRates ) {
@@ -77,10 +65,9 @@ export class ConversionController {
     }, 21600000); // 6 hours interval
   }
 
-  // Calculate the conversion rates based on USD.
   private setCalcRates() {
     const baseRates = this.getBaseRates();
-    if ( baseRates.timestamp ) {
+    if ( baseRates.success ) {
       for (const [key1, value1] of Object.entries(baseRates.rates)) {
         this.calcRates[key1] = {};
         this.calcRates[key1][key1] = 1.00;
@@ -104,19 +91,19 @@ export class ConversionController {
     return this.calcRates;
   }
 
-  // Do the conversion and return the result to the client.
   private doConversion( message: queryParams ) {
     const calcRates: CalcRate = this.getCalcRates(); 
-    const conversion: Conversion = { 
-      source_currency: message.from + '', 
-      source_value: (+message.amount).toFixed(2) + '', 
-      target_currency: message.to + '', 
-      target_value: (+calcRates[message.from][message.to] * +message.amount).toFixed(2) + '', 
-      conversion_rate: calcRates[message.from][message.to] + '', 
-      utc_datetime: new Date().toUTCString(), 
-      user_email: message.email
+    const converted_obj: Conversion = { 
+        transaction_id: transac_id + '',
+        user_id: user_id + '', 
+        source_currency: params.from + '', 
+        source_value: (+params.amount).toFixed(2) + '', 
+        target_currency: params.to + '', 
+        target_value: (+calcRates[params.from][params.to] * +params.amount).toFixed(2) + '', 
+        conversion_rate: calcRates[params.from][params.to] + '', 
+        utc_datetime: new Date().toUTCString()
     };
-    return conversion; 
+    //return (this.checkConvertedObj(converted_obj)) ? converted_obj : false;
   }
 
   // Check if all required parameters are present and valid
@@ -134,8 +121,7 @@ export class ConversionController {
     if ( !validator.validate(queryParams.email) ) throw new HttpException(`Email must be a valid mail box name.`, HttpStatus.BAD_REQUEST);
   }
 
-  // Endpoint for queueing an conversion request from the client and return a message if successful.
-  // Exemple: http://localhost:3000/conversion/?from=USD&to=BRL&amount=100.00&email=miguel@gmail.com
+  // Queue an conversion request from the client and return a message if successful.
   @Get()  
   getConversion( @Query() queryParams: queryParams ): Message {
 
@@ -147,8 +133,7 @@ export class ConversionController {
     }
   }
 
-  // Endpoint for returning the available currency codes for conversion to the client.
-  // Exemple: http://localhost:3000/conversion/codes
+  // Return the available currency codes for conversion to the client.
   @Get('codes')  
   getCodes(): Message {
 

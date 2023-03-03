@@ -46,9 +46,10 @@ export class ConversionController {
   private sendMailUser( conversion: Conversion ) {
     const to = conversion.user_email;
     const subject = 'Conversion result';
-    const body = `The conversion from ${conversion.source_currency} ${conversion.source_value} to ${conversion.target_currency} is ${conversion.target_value} with a conversion rate of ${conversion.conversion_rate} at ${conversion.utc_datetime}.`;
-    //mailer.send(to, subject, body);
-    console.log(to, subject, body);
+    const body = `The conversion from ${conversion.source_value} ${conversion.source_currency} 
+    to ${conversion.target_currency} is ${conversion.target_value} ${conversion.target_currency} 
+    with a conversion rate of ${conversion.conversion_rate} at ${conversion.utc_datetime}.`;
+    console.log(body);
   }
 
   // Set the base rates

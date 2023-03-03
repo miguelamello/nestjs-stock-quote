@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Squiss, Message } from 'squiss-ts';
+import { Subject, Observable } from 'rxjs';
 import { queryParams } from '../interfaces/queryParam.interface';
 
 @Injectable()
 export class AwsSqsService {
 
   private readonly squiss: Squiss;
+  
 
   constructor() {
 
@@ -28,7 +30,7 @@ export class AwsSqsService {
   }
 
   onMessage(message: Message): void {
-    console.log(JSON.stringify(message.body));
+    console.log(message.body);
     message.del();
   }
 
@@ -43,10 +45,7 @@ export class AwsSqsService {
 
   async sendMessage( message: queryParams ): Promise<void> {
     const messageToSend = message;
-    const propsToSend = {
-        p1: 1,
-        p2: 2,
-    };
+    const propsToSend = {};
 
     await this.squiss.sendMessage(messageToSend, 0, propsToSend);
 
