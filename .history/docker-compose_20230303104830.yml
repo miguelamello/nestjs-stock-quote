@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  elasticmq-native:
+    image: softwaremill/elasticmq-native
+    ports:
+      - "9324:9324"
+
+  pruvo-app:
+    depends_on:
+      - elasticmq-native
+    build: . 
+    environment:
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+      - 
+    ports:
+      - "3000:3000"
+    command: ["./wait.sh", "localhost:9324", "--", "npm", "start"]
+

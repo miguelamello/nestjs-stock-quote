@@ -120,13 +120,13 @@ let ConversionController = class ConversionController {
         this.checkParams(queryParams);
         this.awsSqsService.sendMessage(queryParams);
         return {
-            statusCode: true,
+            statusCode: 200,
             message: 'Soon you will receive an email with the conversion result. Thank you.'
         };
     }
     getCodes() {
         return {
-            statusCode: true,
+            statusCode: 200,
             message: currency_names_1.default
         };
     }

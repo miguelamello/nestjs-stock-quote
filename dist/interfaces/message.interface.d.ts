@@ -1,4 +1,4 @@
 export interface Message {
-    statusCode: boolean;
+    statusCode: number;
     message: string | object;
 }

@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  elasticmq-native:
+    image: softwaremill/elasticmq-native
+    ports:
+      - "9324:9324"
+
+  pruvo-app:
+    depends_on:
+      - elasticmq-native
+    build: .
+    ports:
+      - "3000:3000"
+    command: ["./wait.sh", "localhost:9324", "--", "npm", "start"]
+

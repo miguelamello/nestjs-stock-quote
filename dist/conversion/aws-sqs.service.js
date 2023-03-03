@@ -20,7 +20,7 @@ let AwsSqsService = class AwsSqsService {
             accessKeyId: 'dummy',
             secretAccessKey: 'dummy',
             region: 'dummy',
-            endpoint: 'http://localhost:9324'
+            endpoint: 'http://192.168.15.114:9324'
         };
         this.squiss = new squiss_ts_1.Squiss({
             awsConfig,
